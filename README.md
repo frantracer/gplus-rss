@@ -5,6 +5,14 @@ Application that generates a RSS feed from a gplus profile.
 
 ## Launch with docker
 
+First include your google API key in the code:
+
+/* API key to connect to Google API */
+$apiKey = 'YOUR API KEY';
+
+You can generate it from:
+https://console.developers.google.com
+
 Launch the application using docker:
 
 ```bash
