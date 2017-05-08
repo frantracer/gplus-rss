@@ -19,6 +19,8 @@ class RssGplusItem {
         if ($format == "twitter") {
             if(strlen($str) > 139) {
                 $formatted_str = substr($str, 0, 135) . "...";
+            } else {
+                $formatted_str = $str;
             }
         } else {
             $formatted_str = $str;
