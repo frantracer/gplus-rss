@@ -29,7 +29,7 @@ class RssGplusItem {
     }
     
     private function generate_content() {
-        return "<![CDATA[ <p><a href=\"".$this->source."\">Source</a>.</p> ]]>";
+        return "<![CDATA[ <p><a href=\"".$this->source."\">Source</a></p> ]]>";
     }
 
     public function __construct($entry, $format)
