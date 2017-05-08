@@ -7,8 +7,10 @@ Application that generates a RSS feed from a gplus profile.
 
 First include your google API key in the code:
 
+```bash
 /* API key to connect to Google API */
 $apiKey = 'YOUR API KEY';
+```
 
 You can generate it from:
 https://console.developers.google.com
