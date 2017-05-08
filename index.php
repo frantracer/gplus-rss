@@ -43,7 +43,7 @@ class RssGplusItem {
                 $title = 'No title';
             }
         }
-        $this->title = $this->format_title($title.$title, $format);
+        $this->title = $this->format_title($title, $format);
         $this->source = $source;
         $this->content = $this->generate_content();
         $this->link = $entry['url'];
