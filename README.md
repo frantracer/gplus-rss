@@ -32,6 +32,8 @@ You can provide the following query parameters:
 - **format (optional)**: Valid formats are
   - default: Nothing will be changed from original source
   - twitter: The title will be trimmed to have maximum 140 characters
+  - collection: Filter entries by collection name
  
 Examples:
 http://127.0.0.1/?profile=%2BGoogle&format=twitter
+http://127.0.0.1/?profile=%2BFranTraperoCerezo&collection=Tech%20Media

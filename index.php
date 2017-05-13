@@ -32,7 +32,26 @@ class RssGplusItem {
         return "<![CDATA[ <p><a href=\"".$this->source."\">Source</a></p> ]]>";
     }
 
-    public function __construct($entry, $format)
+    private function get_data($url) {
+        $ch = curl_init();
+        $timeout = 5;
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        $data = curl_exec($ch);
+        curl_close($ch);
+        return $data;
+    }
+    
+    private function get_collection($url) {
+        $data = $this->get_data($url);
+        $re = '/<a href="\.(.+)" class="UTObDb" aria-label="(.+?)">(.+?)<\/a>/';
+        preg_match($re, $data, $matches);
+        $collection_name = $matches[3];
+        return $collection_name;
+    }
+
+    public function __construct($entry, $format, $skip_collection)
     {
         $title = $entry['title'];
         $source = "";
@@ -52,7 +71,11 @@ class RssGplusItem {
         $this->description = $title;
         $this->id = $entry['id'];
         $this->publish_date = $entry['published'];
-        $this->collection = "Generic";
+        if ($skip_collection) {
+            $this->collection = "";
+        } else {
+            $this->collection = $this->get_collection($entry["url"]);
+        }
     }
 
 }
@@ -68,6 +91,7 @@ $apiKey = '';
 /* Get url parameters */
 $profile_id = $_GET['profile'];
 $format = $_GET['format'];
+$collection = $_GET['collection'];
 
 /* Create Google Client */
 include_once __DIR__ . '/google-api-php-client-2.1.3/vendor/autoload.php';
@@ -77,8 +101,18 @@ $client->setDeveloperKey($apiKey);
 
 /* Get the list of entries for a user */
 $service = new Google_Service_Plus($client);
-$activities = $service->activities->listActivities($profile_id, 'public');
+$activities = $service->activities->listActivities($profile_id, 'public', [ 'maxResults' => 5 ] );
 $profile = $service->people->get($profile_id);
+
+/* Create list of entries */
+$activity_list = array();
+foreach ($activities as $activity) {
+    $gplus_item = new RssGplusItem($activity, $format, $collection == "");
+    if ($gplus_item->collection == $collection) {
+        array_push($activity_list, $gplus_item);
+    }
+}
+
 ?>
 
 <rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
@@ -94,9 +128,7 @@ $profile = $service->people->get($profile_id);
         <sy:updateFrequency>12</sy:updateFrequency>
         <sy:updateBase>2000-01-01T12:00+00:00</sy:updateBase>
 
-<?php foreach ($activities as $activity): ?>
-    
-    <?php $gplus_item = new RssGplusItem($activity, $format) ?>
+<?php foreach ($activity_list as $gplus_item): ?>    
         <item>
             <title><?= $gplus_item->title ?></title>
             <link><?= $gplus_item->link ?></link>
@@ -106,7 +138,6 @@ $profile = $service->people->get($profile_id);
             <dc:subject><?= $gplus_item->collection ?></dc:subject>
             <dc:date><?= $gplus_item->publish_date ?></dc:date>
         </item>
-  
 <?php endforeach ?>
 
     </channel>
