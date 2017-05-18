@@ -15,16 +15,17 @@ class RssGplusItem {
     public $collecion;
     public $content;
 
-    private function format_title($str, $format) {
-        if ($format == "twitter") {
-            if(strlen($str) > 139) {
-                $formatted_str = substr($str, 0, 135) . "...";
-            } else {
-                $formatted_str = $str;
+    private function trim_string($str, $max) {
+        $tag = "...";
+        $max = $max ?: -1;
+        $formatted_str = $str;
+        if($max != -1 && strlen($str) > $max) {
+            if($max > strlen($tag)) {
+                $formatted_str = substr($str, 0, $max - strlen($tag)) . $tag;
+            }else{
+                $formatted_str = substr($str, 0, $max);
             }
-        } else {
-            $formatted_str = $str;
-        }
+        } 
         return $formatted_str;
     }
     
@@ -51,7 +52,7 @@ class RssGplusItem {
         return $collection_name;
     }
 
-    public function __construct($entry, $format, $skip_collection)
+    public function __construct($entry, $settings)
     {
         $title = $entry['title'];
         $source = "";
@@ -64,14 +65,14 @@ class RssGplusItem {
                 $title = 'No title';
             }
         }
-        $this->title = $this->format_title($title, $format);
+        $this->title = $this->trim_string($title, $settings['title_max']);
         $this->source = $source;
         $this->content = $this->generate_content();
         $this->link = $entry['url'];
         $this->description = $title;
         $this->id = $entry['id'];
         $this->publish_date = $entry['published'];
-        if ($skip_collection) {
+        if ($settings['skip_collection']) {
             $this->collection = "";
         } else {
             $this->collection = $this->get_collection($entry["url"]);
@@ -90,8 +91,8 @@ $apiKey = '';
 
 /* Get url parameters */
 $profile_id = $_GET['profile'];
-$format = $_GET['format'];
 $collection = $_GET['collection'];
+$title_max = $_GET['title_max'];
 
 /* Create Google Client */
 include_once __DIR__ . '/google-api-php-client-2.1.3/vendor/autoload.php';
@@ -107,7 +108,7 @@ $profile = $service->people->get($profile_id);
 /* Create list of entries */
 $activity_list = array();
 foreach ($activities as $activity) {
-    $gplus_item = new RssGplusItem($activity, $format, $collection == "");
+    $gplus_item = new RssGplusItem($activity, [ 'title_max' => $title_max, 'skip_collection' => $collection == "" ]);
     if ($gplus_item->collection == $collection) {
         array_push($activity_list, $gplus_item);
     }
