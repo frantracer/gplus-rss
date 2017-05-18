@@ -29,11 +29,12 @@ http://127.0.0.1/?profile=%2BGoogle
 You can provide the following query parameters:
 
 - **profile (mandatory)**: Profile ID of google+ profile
-- **format (optional)**: Valid formats are
-  - default: Nothing will be changed from original source
-  - twitter: The title will be trimmed to have maximum 140 characters
-  - collection: Filter entries by collection name
+- **title_max (optional)**: Maximum number of characters for the title
+- **collection (optional)**: Filter entries by collection name. If undefined all entries are returned.
+- **gplus_link (optional)**: Default is set to false. If True the url will be google+ entry instead of the source url
  
 Examples:
-http://127.0.0.1/?profile=%2BGoogle&format=twitter
-http://127.0.0.1/?profile=%2BFranTraperoCerezo&collection=Tech%20Media
+
+http://127.0.0.1/?profile=%2BGoogle&title_max=140
+
+http://127.0.0.1/?profile=%2BFranTraperoCerezo&collection=Tech%20Media&gplus_link=1
