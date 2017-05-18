@@ -56,15 +56,19 @@ class RssGplusItem {
     {
         $title = $entry['title'];
         $source = "";
-        if ($title == "") {
-            $attachments = $entry['object']['attachments'];
-            if(count($attachments) > 0) {
+        $attachments = $entry['object']['attachments'];
+
+        if(count($attachments) > 0) {
+            if ($title == "") {
                 $title = $attachments[0]['displayName'];
-                $source = $attachments[0]['url'];
-            } else {
+            }
+            $source = $attachments[0]['url'];
+        } else {
+            if ($title == "") {
                 $title = 'No title';
             }
         }
+
         $this->title = $this->trim_string($title, $settings['title_max']);
         $this->source = $source;
         $this->content = $this->generate_content();
