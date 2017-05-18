@@ -68,7 +68,7 @@ class RssGplusItem {
         $this->title = $this->trim_string($title, $settings['title_max']);
         $this->source = $source;
         $this->content = $this->generate_content();
-        $this->link = $entry['url'];
+        $this->link = $settings['gplus_link'] ? $entry['url'] : $source;
         $this->description = $title;
         $this->id = $entry['id'];
         $this->publish_date = $entry['published'];
@@ -93,6 +93,7 @@ $apiKey = '';
 $profile_id = $_GET['profile'];
 $collection = $_GET['collection'];
 $title_max = $_GET['title_max'];
+$gplus_link = $_GET['gplus_link'];
 
 /* Create Google Client */
 include_once __DIR__ . '/google-api-php-client-2.1.3/vendor/autoload.php';
@@ -108,7 +109,7 @@ $profile = $service->people->get($profile_id);
 /* Create list of entries */
 $activity_list = array();
 foreach ($activities as $activity) {
-    $gplus_item = new RssGplusItem($activity, [ 'title_max' => $title_max, 'skip_collection' => $collection == "" ]);
+    $gplus_item = new RssGplusItem($activity, [ 'title_max' => $title_max, 'skip_collection' => $collection == "", 'gplus_link' => $gplus_link ]);
     if ($gplus_item->collection == $collection) {
         array_push($activity_list, $gplus_item);
     }
