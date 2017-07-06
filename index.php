@@ -28,6 +28,12 @@ class RssGplusItem {
         } 
         return $formatted_str;
     }
+
+    private function escape_chars($str) {
+        $escaped_str = $str;
+        $escaped_str = str_replace("&", "&amp;", $str);
+        return $escaped_str;
+    }
     
     private function generate_content() {
         return "<![CDATA[ <p><a href=\"".$this->source."\">Source</a></p> ]]>";
@@ -72,7 +78,7 @@ class RssGplusItem {
         $this->title = $this->trim_string($title, $settings['title_max']);
         $this->source = $source;
         $this->content = $this->generate_content();
-        $this->link = $settings['gplus_link'] ? $entry['url'] : $source;
+        $this->link = $this->escape_chars($settings['gplus_link'] ? $entry['url'] : $source);
         $this->description = $title;
         $this->id = $entry['id'];
         $this->publish_date = $entry['published'];
